@@ -12,14 +12,14 @@
 #panel .n.r{background:#7a7a7a}#panel .n.x{background:#c0392b}
 #panel .p{margin-left:auto;font-weight:600;white-space:nowrap}#panel small{color:#7b6f62}
 .lbl{background:#3b2f25e6;color:#fff;border-radius:10px;padding:2px 7px;font-size:12px;white-space:nowrap;pointer-events:none}
-.lbl.r{background:#6b6b6be6}.lbl.x{background:#c0392be6}
+.lbl.r{background:#6b6b6be6}.lbl.room{background:#fffaf3;color:#3b2f25;border:1px solid #8a5a2b;font-weight:600}.lbl.x{background:#c0392be6}
 .note{color:#7b6f62;font-size:12px;line-height:1.5}
 @media (max-width:760px){#panel{top:auto;left:8px;right:8px;width:auto;height:46vh;display:none}.bar button{padding:6px 10px;font-size:13px}}
 </style></head><body>
 <div id="c"></div>
 <div class="bar">
  <button id="bNow">지금</button><button id="bAfter" class="on">바꾼 뒤</button><button id="bClean">깔끔하게</button>
- <button data-v="top">위에서</button><button data-v="sofa">소파에서</button><button data-v="bed">침대에서</button><button data-v="desk">책상에서</button><button data-v="bath">화장실</button>
+ <button data-v="top">위에서</button><button data-v="unit">집 전체</button><button data-v="sofa">소파에서</button><button data-v="bed">침대에서</button><button data-v="desk">책상에서</button><button data-v="bath">화장실</button>
  <button id="bLbl" class="on">이름표</button><button id="bList" class="on">목록</button>
 </div>
 <div id="panel"></div>
@@ -56,7 +56,7 @@ const pl1=new THREE.PointLight(0xffb36b,1.2,3.5,1.5);pl1.position.set(2.24,1.0,-
 label('2 협탁',2.27,.55,-1.6);label('3 침대 스탠드',2.24,1.22,-1.82);
 // 4 ÖKENSAND floor lamp by sofa/recliner corner
 cyl(.24,.24,.03,4.56,.015,-.74,beige);cyl(.012,.012,1.4,4.56,.72,-.74,beige);cyl(.15,.18,.25,4.56,1.42,-.74,linen);
-const pl2=new THREE.PointLight(0xffb36b,1.4,4,1.5);pl2.position.set(4.56,1.42,-.74);after.add(pl2);label('4 플로어 램프',4.56,1.65,-.74);
+const pl2=new THREE.PointLight(0xffb36b,1.4,4,1.5);pl2.position.set(4.56,1.42,-.74);after.add(pl2);label('4 플로어 램프(지금 것 옮기기)',4.56,1.65,-.74);
 // 5 bedding white duvet + pillows (bed x .4-2.0, z -2.0..0.05)
 box(1.70,.10,1.66,1.2,.80,-.70,white);box(.62,.14,.38,.82,.86,-1.78,white);box(.62,.14,.38,1.56,.86,-1.78,white);
 label('5 흰 이불·커버',1.2,.9,-.6);
@@ -76,7 +76,7 @@ const tvg=new THREE.Group();after.add(tvg);
 box(1.47,.6,.39,3.3,.3,2.18,M(0x3a2a20,{transparent:true,opacity:.55}),tvg);box(1.23,.71,.05,3.3,.98,2.25,M(0x111111,{transparent:true,opacity:.6}),tvg);
 label('T TV 자리(TV가 있으면)',3.3,1.45,2.2,'r');
 // bathroom bits (approx, x -4.4..-2.9, z -2..0)
-box(.3,.12,.22,-3.45,.95,-1.75,white);label('B 화장실: 샤워커튼·펌프통·수건·트레이',-3.6,1.6,-1.0);
+box(.3,.12,.22,-3.45,.95,-1.75,white);label('B 화장실: 샤워커튼·샴푸·수건·트레이',-3.7,1.6,-1.7);
 // X: things to take out (free)
 [['빼기: 커피 테이블',3.8,.6,-.67],['옮기기: 신발 선반 → 복도',2.95,1.3,2.15],['치우기: 바닥 박스·물·카트',.45,.9,2.05],['치우기: 선풍기·청소기',4.5,.9,.3]].forEach(([t,x,y,z])=>label(t,x,y,z,'x'));
 
@@ -104,24 +104,30 @@ box(1.6,.32,2.0,1.2,.16,-.98,bedM,keep);box(1.6,1.0,.08,1.2,.5,-1.98,bedM,keep);
 box(1.85,.42,.9,3.87,.21,-1.55,grey,keep);box(1.85,.45,.2,3.87,.62,-1.9,grey,keep);box(.2,.25,.9,3.04,.55,-1.55,grey,keep);box(.2,.25,.9,4.7,.55,-1.55,grey,keep);
 cyl(.28,.28,.08,1.7,.5,1.55,dark,keep);box(.5,.55,.08,1.7,.85,1.8,dark,keep);
 box(.6,.36,.04,1.45,1.15,2.3,dark,keep);
+
+// ===== whole unit from scan (approx): kitchen, bath, closet, hallway
+const unit=new THREE.Group();s.add(unit);
+const fl2=new THREE.MeshStandardMaterial({color:0xd2ad84,roughness:.9}),tileM=new THREE.MeshStandardMaterial({color:0xe9e6e1,roughness:.9});
+function fpatch(x0,x1,z0,z1,mat){const m=new THREE.Mesh(new THREE.PlaneGeometry(x1-x0,z1-z0),mat);m.rotation.x=-Math.PI/2;m.position.set((x0+x1)/2,-.02,(z0+z1)/2);unit.add(m);}
+fpatch(-4.05,-0.8,0.36,2.42,fl2);fpatch(-4.46,-2.9,-2.22,0.1,fl2);fpatch(-2.5,-1.0,-2.96,-1.4,fl2);fpatch(-2.9,0.4,-1.4,0.36,fl2);
+function rlabel(t,x,z){const d=document.createElement('div');d.className='lbl room';d.textContent=t;d.dataset.full=t;d.dataset.short=t.split(' ')[0];const o=new CSS2DObject(d);o.position.set(x,.05,z);unit.add(o);}
+rlabel('큰 방 약 4.4 x 4.4m',2.6,0.6);rlabel('주방 약 3.3 x 2.1m',-2.4,1.4);rlabel('화장실 약 1.6 x 2.3m',-3.7,-1.0);rlabel('옷장(거울문)',-1.75,-2.2);rlabel('복도',-1.4,-0.5);
 // ===== UI
 const items=[
-['1','긴 책상 상판 LAGKAPTEN 200x60cm 검정갈색','79.99','어제 호텔처럼 긴 책상. 의자 그대로, 팔꿈치 높이에 맞춰 다리 고정'],
+['1','긴 책상 상판 LAGKAPTEN 200x60cm 검정갈색','79.99','어제 호텔처럼 긴 책상. 메시 의자 그대로, 팔꿈치 높이에 맞춰 다리 고정'],
 ['1','OLOV 높이조절 다리 x5 (200cm는 가운데 다리 필요)','62.50','60~90cm 조절'],
-['2','협탁 UGGLERUM 46x40x67cm','99.99','호텔식 둥근 나무 협탁. 지금 흰 협탁은 화장실·옷장 수납으로'],
-['3','침대 스탠드 HALGATT 리넨 갓, 밝기 조절','59.99','천장등 끄고 낮은 불 1'],
-['4','플로어 램프 ÖKENSAND 155cm','89.99','소파·리클라이너 사이 낮은 불 2'],
-['0','2700K 전구 (SOLHETTA 등)','~25','집 전구를 한 색으로. 개수 몰라 추정'],
-['5','Marriott 호텔 이불 속통 (30% 할인, 11/29까지)','118.30','Full 기준 가격, 퀸 가격은 확인 필요'],
+['2','협탁 UGGLERUM 46x40x67cm','99.99','지금 흰 서랍 협탁은 화장실·옷장 수납으로'],
+['3','침대 스탠드 HALGATT 리넨 갓, 밝기 조절','59.99','천장 선풍기 등 끄고 낮은 불'],
+['0','2700K 전구 (SOLHETTA 등)','~25','천장 선풍기 등·스탠드 전구를 한 색으로. 개수 몰라 추정'],
+['5','Marriott 호텔 이불 속통 (30% 할인, 11/29까지)','118.30','Full 기준 가격, 퀸 가격은 확인 필요. 지금 꽃무늬 이불 대신'],
 ['5','ÄNGSLILJA 흰 이불커버 Full/Queen','39.99','호텔 흰 침구'],
-['6','DYTÅG 리넨 커튼 1쌍 145x250cm','99.99','봉은 천장 가까이, 창보다 넓게'],
+['6','DYTÅG 리넨 커튼 1쌍 145x250cm','99.99','블라인드 오른쪽 아래 살이 휘어 있음(영상1 7초). 커튼으로 가림'],
 ['6','커튼 봉 (창 약 2.2m + 양옆 여유)','~15','추정'],
 ['7','Alice + Co 리드 + 필로우 스프레이 (30% 할인)','33.60','어제 방 향'],
-['B','천 샤워 커튼 (IKEA BORSTÅLÖE)','14.99','렌트 화장실에서 제일 큰 천'],
-['B','벽 부착 펌프통 3개 (Maisonovo)','45.00','구멍 없이 붙임'],
-['B','Alice + Co 샴푸·컨디셔너·바디워시','39.90','각 $13.30'],
+['B','천 샤워 커튼 (IKEA BORSTÅLÖE)','14.99','욕조에 지금 커튼이 있으면 바꾸기만'],
+['B','Alice + Co 샴푸·컨디셔너·바디워시','39.90','각 $13.30. 욕조 벽 선반(니치)에 둠'],
 ['B','VÅGSJÖN 흰 수건 4 + 손수건 2','41.94','같은 수건, 같은 접기'],
-['B','TAVELÅN 트레이 2개','13.99','세면대 비우기']];
+['B','TAVELÅN 트레이 2개','13.99','세면대 위 병·고데기 정리']];
 const total=items.reduce((a,i)=>a+parseFloat(i[2].replace('~','')),0);
 let h=`<h3>사야 할 것 ($1,000 안)</h3><div class="note">가격은 11/24 기준, 세금 별도. 크기는 스캔 눈대중이라 사기 전 줄자로 확인.</div>`;
 h+=items.map(i=>`<div class="row"><div class="n">${i[0]}</div><div>${i[1]}<br><small>${i[3]}</small></div><div class="p">$${i[2]}</div></div>`).join('');
@@ -130,15 +136,21 @@ h+=`<h3>따로 정할 것</h3>
 <div class="row"><div class="n r">R</div><div>리클라이너 IKEA ARNÄSVALL 91x93cm, 회전·흔들<br><small>창가 자리. 펼친 길이는 IKEA가 안 적어 둠</small></div><div class="p">$499</div></div>
 <div class="row"><div class="n r">R</div><div>Ashley Kegler 99x114cm<br><small>벽에서 30cm, 펼치면 178cm. 이 자리엔 커요</small></div><div class="p">$449.99</div></div>
 <div class="row"><div class="n r">T</div><div>KALLAX TV장 147x39cm (TV가 있으면)<br><small>소파 맞은편 벽, 책상 옆</small></div><div class="p">$79.99</div></div>
+<h3>영상에서 보고 뺀 것</h3>
+<div class="row"><div class="n">4</div><div>플로어 램프 ÖKENSAND 안 사도 됨<br><small>신발 선반 옆 크림색 스탠드(영상1 0초)를 소파 옆으로 옮겨요</small></div><div class="p">-$89.99</div></div>
+<div class="row"><div class="n">B</div><div>벽 부착 펌프통 안 사도 됨<br><small>욕조 벽에 선반 구멍(니치)이 이미 있음(영상2 18초)</small></div><div class="p">-$45.00</div></div>
 <h3>공짜로 먼저 (0단계)</h3>
-<div class="row"><div class="n x">X</div><div>커피 테이블 빼기, 신발 선반 복도로, 바닥 박스·물·카트·선풍기 옷장으로, 천장등 끄고 지내기</div><div class="p">$0</div></div>
-<div class="note" style="margin-top:8px">스캔: Polycam Space 모드(아이폰 17, 라이다 없음). 방 약 4.4 x 4.4m, 천장 약 2.43m. 치수는 줄자 확인 전.</div>`;
+<div class="row"><div class="n x">X</div><div>큰 방: 커피 테이블과 위 물건 빼기, 바닥 검은 상자·가방 치우기, 나무 의자 1개 빼기, 신발 선반은 현관 쪽 정리</div><div class="p">$0</div></div>
+<div class="row"><div class="n x">X</div><div>복도 화이트보드 구석: 생수 묶음·박스·카트·밴드 → 옷장 안으로</div><div class="p">$0</div></div>
+<div class="row"><div class="n x">X</div><div>세면대 위 병·고데기 → 서랍(트레이에 매일 쓰는 것만), 변기 위 세제 → 세면대 아래</div><div class="p">$0</div></div>
+<div class="row"><div class="n x">X</div><div>주방 조리대 식기 건조대 비우고 커피머신·주전자만</div><div class="p">$0</div></div>
+<div class="note" style="margin-top:8px">스캔(Polycam, 아이폰 17)과 영상 2개(14초·19초)를 1초마다 쪼갠 사진 33장으로 만들었어요. 천장이 2.43m로 나와 미국 표준 8피트(2.44m)와 맞아서 크기는 거의 맞아요. 건물 공고는 스튜디오 620sq ft이고 치수 도면은 공개된 게 없어요.</div>`;
 document.getElementById('panel').innerHTML=h;
-const V={top:[[2.61,9,0.18],[2.61,0,0.18],2.0],sofa:[[3.8,1.3,-1.75],[2.4,0.8,2.3],2.25],bed:[[1.0,1.35,-1.75],[4,0.8,1.2],2.25],desk:[[1.2,1.35,1.9],[3.6,0.8,-1.4],2.25],bath:[[-2.2,2.9,-0.2],[-3.7,0.5,-1.3],2.0],over:[[6.2,5.2,4.6],[2.4,0,0.2],2.3]};
+const V={unit:[[0.6,11,0.0],[0.6,0,0.0],2.0],top:[[2.61,9,0.18],[2.61,0,0.18],2.0],sofa:[[3.8,1.3,-1.75],[2.4,0.8,2.3],2.25],bed:[[1.0,1.35,-1.75],[4,0.8,1.2],2.25],desk:[[1.2,1.35,1.9],[3.6,0.8,-1.4],2.25],bath:[[-2.2,2.9,-0.2],[-3.7,0.5,-1.3],2.0],over:[[6.2,5.2,4.6],[2.4,0,0.2],2.3]};
 let curView='sofa';function go(k){curView=k;const v=V[k];const asp=innerWidth/innerHeight;let p=[...v[0]];
- if(k==='top'){const half=2.75,t=Math.tan(THREE.MathUtils.degToRad(25));p[1]=Math.max(half/t,half/(t*asp))+1.2;cam.fov=50;}
+ if(k==='top'||k==='unit'){const half=k==='unit'?5.2:2.75,t=Math.tan(THREE.MathUtils.degToRad(25));p[1]=Math.max(half/t,half/(t*asp))+1.2;cam.fov=50;}
  else cam.fov=asp<.8?88:70;
- cam.position.set(...p);ctl.target.set(...v[1]);clip.constant=v[2];ceil.visible=(k!=='top'&&k!=='bath');cam.updateProjectionMatrix();ctl.update();document.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===k));}
+ cam.position.set(...p);ctl.target.set(...v[1]);clip.constant=v[2];ceil.visible=(k!=='top'&&k!=='bath'&&k!=='unit');cam.updateProjectionMatrix();ctl.update();document.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===k));}
 window.go=go;
 document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>go(b.dataset.v));
 let clean=false;function setMode(a){after.visible=a;scanMats.forEach(m=>m.color.set(a?0xffe6c8:0xffffff));bNow.classList.toggle('on',!a);bAfter.classList.toggle('on',a);}
